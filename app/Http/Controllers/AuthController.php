@@ -76,4 +76,12 @@ class AuthController extends Controller
             'message' => 'Logout efetuado com sucesso!'
         ];
     }
+
+    /*
+    * Retornar usuário
+    */
+    public function me()
+    {
+        return auth()->user();
+    }
 }
