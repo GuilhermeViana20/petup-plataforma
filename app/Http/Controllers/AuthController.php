@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Token;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Sanctum\Contracts\HasApiTokens;
 
 class AuthController extends Controller
 {
@@ -16,16 +19,19 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'required|string',
             'email' => 'required|string|unique:users,email',
-            'password' => 'required|string|confirmed'
+            'password' => 'required|string|confirmed',
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => bcrypt($request->password)
+            'password' => bcrypt($request->password),
         ]);
 
         $token = $user->createToken('primeiroToken')->plainTextToken;
+
+        $user->remember_token = $token;
+        $user->save();
 
         $response = [
             'user' => $user,
@@ -56,6 +62,9 @@ class AuthController extends Controller
         }
 
         $token = $user->createToken('primeiroToken')->plainTextToken;
+
+        $user->remember_token = $token;
+        $user->save();
 
         $response = [
             'user' => $user,
